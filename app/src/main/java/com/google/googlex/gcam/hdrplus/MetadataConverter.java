@@ -171,6 +171,10 @@ public class MetadataConverter {
         }
     }
 
+    static {
+        System.loadLibrary("madness");
+    }
+
     public MetadataConverter(mmb mmb) {
         characteristics = mmb;
         minIso = ((Range<Integer>) mmb.b(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE)).getLower();
@@ -947,7 +951,12 @@ public class MetadataConverter {
         return frameMetadata;
     }
 
+    private native SpatialGainMap convertToSpatialGainMapPatch();
+
     public SpatialGainMap convertToSpatialGainMap(mpz mpz) {
+        if (pCharacteristics.isExynos())
+            return convertToSpatialGainMapPatch(); // Early return
+
         var lensShadingMap = (LensShadingMap) mpz.a(CaptureResult.STATISTICS_LENS_SHADING_CORRECTION_MAP);
         if (lensShadingMap == null) {
             Log.w(TAG, "android.statistics.lensShadingMap was null, returning the empty SpatialGainMap()");
