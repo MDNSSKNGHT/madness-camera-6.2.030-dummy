@@ -55,6 +55,7 @@ import com.google.googlex.gcam.WeightedNormalizedRectVector;
 import com.google.googlex.gcam.WeightedPixelRect;
 import com.google.googlex.gcam.WeightedPixelRectVector;
 import com.google.googlex.gcam.androidutils.MathUtils;
+import com.madnessknight.ProductCharacteristics;
 
 import java.util.Arrays;
 import java.util.List;
@@ -96,6 +97,8 @@ public class MetadataConverter {
     public final int minIso;
     public final Rect preCorrectionActiveArraySize;
     public final int[] redBlueIndexMap;
+
+    public static final ProductCharacteristics pCharacteristics = ProductCharacteristics.getSef();
 
     public static class ExtendedFaces {
         private int[] faceLandmarkCounts;
@@ -851,19 +854,31 @@ public class MetadataConverter {
         }
         frameMetadata.setDng_noise_model_bayer(dngNoiseModelArr);
 
-        float[] dynBl = (float[]) capture.a(CaptureResult.SENSOR_DYNAMIC_BLACK_LEVEL);
-        if (dynBl == null) {
-            var blackLevelPattern = (BlackLevelPattern) characteristics.a(CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN);
-            if (blackLevelPattern != null) {
-                float[] blPattern = new float[4];
-                for (int cfa = 0; cfa < 4; cfa++)
-                    blPattern[cfa] = (float) blackLevelPattern.getOffsetForIndex(cfa % 2, cfa / 2);
-                frameMetadata.setBlack_levels_bayer(blPattern);
-            }
-        } else {
-            frameMetadata.setBlack_levels_bayer(dynBl);
-        }
+        if (!pCharacteristics.isExynos()) {
 
+            float[] dynBl = (float[]) capture.a(CaptureResult.SENSOR_DYNAMIC_BLACK_LEVEL);
+            if (dynBl == null) {
+                var blackLevelPattern = (BlackLevelPattern) characteristics.a(CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN);
+                if (blackLevelPattern != null) {
+                    float[] blPattern = new float[4];
+                    for (int cfa = 0; cfa < 4; cfa++)
+                        blPattern[cfa] = (float) blackLevelPattern.getOffsetForIndex(cfa % 2, cfa / 2);
+                    frameMetadata.setBlack_levels_bayer(blPattern);
+                }
+            } else {
+                frameMetadata.setBlack_levels_bayer(dynBl);
+            }
+
+        } else {
+
+            if (pCharacteristics.isExynos9610() || pCharacteristics.isExynos9611())
+                frameMetadata.setBlack_levels_bayer(new float[]{0.0f, 0.0f, 0.0f, 0.0f});
+            else if (pCharacteristics.isExynos9820() || pCharacteristics.isExynos9825())
+                frameMetadata.setBlack_levels_bayer(new float[]{0.0f, 0.0f, 0.0f, 0.0f});
+            else // Fallback if it is Exynos
+                frameMetadata.setBlack_levels_bayer(new float[]{64.0f, 64.0f, 64.0f, 64.0f});
+
+        }
         var focusDistance = (Float) capture.a(CaptureResult.LENS_FOCUS_DISTANCE);
         var focusDistanceCalib = (Integer) characteristics.a(CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION);
         if (focusDistanceCalib == CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED ||
