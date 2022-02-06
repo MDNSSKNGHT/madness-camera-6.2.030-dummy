@@ -772,7 +772,6 @@ public class MetadataConverter {
     }
 
     public FrameMetadata convertToGcamFrameMetadata(mpz capture, Face[] faceArr, GyroSampleVector gyroSampleVector) {
-        float[] fArr;
         var frameMetadata = new FrameMetadata();
         frameMetadata.setSensor_id(getGcamSensorId(characteristics));
         float exposureTimeMs = getExposureTimeMs(capture);
@@ -852,16 +851,17 @@ public class MetadataConverter {
         }
         frameMetadata.setDng_noise_model_bayer(dngNoiseModelArr);
 
-        if ((fArr = (float[]) capture.a(CaptureResult.SENSOR_DYNAMIC_BLACK_LEVEL)) == null) {
-            BlackLevelPattern blackLevelPattern = (BlackLevelPattern) characteristics.a(CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN);
+        float[] dynBl = (float[]) capture.a(CaptureResult.SENSOR_DYNAMIC_BLACK_LEVEL);
+        if (dynBl == null) {
+            var blackLevelPattern = (BlackLevelPattern) characteristics.a(CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN);
             if (blackLevelPattern != null) {
-                float[] fArr2 = new float[4];
-                for (int i2 = 0; i2 < 4; i2++)
-                    fArr2[i2] = (float) blackLevelPattern.getOffsetForIndex(i2 % 2, i2 / 2);
-                frameMetadata.setBlack_levels_bayer(fArr2);
+                float[] blPattern = new float[4];
+                for (int cfa = 0; cfa < 4; cfa++)
+                    blPattern[cfa] = (float) blackLevelPattern.getOffsetForIndex(cfa % 2, cfa / 2);
+                frameMetadata.setBlack_levels_bayer(blPattern);
             }
         } else {
-            frameMetadata.setBlack_levels_bayer(fArr);
+            frameMetadata.setBlack_levels_bayer(dynBl);
         }
 
         var focusDistance = (Float) capture.a(CaptureResult.LENS_FOCUS_DISTANCE);
