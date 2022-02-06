@@ -883,7 +883,8 @@ public class MetadataConverter {
             if (pCharacteristics.isExynos9610() ||
                 pCharacteristics.isExynos9611() ||
                 pCharacteristics.isExynos9820() ||
-                pCharacteristics.isExynos9825())
+                pCharacteristics.isExynos9825() ||
+                pCharacteristics.isExynos2100())
                 frameMetadata.setBlack_levels_bayer(new float[]{0.0f, 0.0f, 0.0f, 0.0f});
 
             else // Fallback if it is Exynos

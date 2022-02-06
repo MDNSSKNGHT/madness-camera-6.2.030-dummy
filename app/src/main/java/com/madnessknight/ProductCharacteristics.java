@@ -43,6 +43,10 @@ public class ProductCharacteristics {
         return soc.endsWith("9825");
     }
 
+    public final boolean isExynos2100() {
+        return soc.endsWith("2100");
+    }
+
     // Exynos and device specific
     public final boolean isA3Y17() {
         return bl.startsWith("A320");
