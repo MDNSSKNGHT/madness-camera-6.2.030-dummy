@@ -7,7 +7,7 @@ import android.os.Build;
 public class ProductCharacteristics {
     private static ProductCharacteristics Sef = null;
 
-    private String soc, hw;
+    private String soc, bl, hw;
 
     private ProductCharacteristics() {}
 
@@ -15,6 +15,7 @@ public class ProductCharacteristics {
         if (Sef == null) {
             var self = new ProductCharacteristics();
             self.soc = Build.BOARD;
+            self.bl = Build.BOOTLOADER;
             self.hw = Build.HARDWARE;
             Sef = self;
         }
@@ -40,5 +41,14 @@ public class ProductCharacteristics {
 
     public final boolean isExynos9825() {
         return soc.endsWith("9825");
+    }
+
+    // Exynos and device specific
+    public final boolean isA3Y17() {
+        return bl.startsWith("A320");
+    }
+
+    public final boolean isJ7Y17() {
+        return bl.startsWith("J730");
     }
 }

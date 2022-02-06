@@ -298,7 +298,12 @@ public class MetadataConverter {
             staticMetadata.setOptically_black_regions(pixelRectVector);
         }
 
-        staticMetadata.setBayer_pattern(convertToBayerPattern((int) characteristics.b(CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)));
+        if (pCharacteristics.isJ7Y17() ||
+            pCharacteristics.isA3Y17())
+            staticMetadata.setBayer_pattern(BayerPattern.kRGGB);
+
+        else
+            staticMetadata.setBayer_pattern(convertToBayerPattern((int) characteristics.b(CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)));
 
         int[] isoRange = {
                 ((Range<Integer>) characteristics.b(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE)).getLower(),
