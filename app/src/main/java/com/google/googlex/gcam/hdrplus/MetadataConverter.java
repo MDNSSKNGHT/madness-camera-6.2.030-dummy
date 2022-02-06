@@ -871,10 +871,12 @@ public class MetadataConverter {
 
         } else {
 
-            if (pCharacteristics.isExynos9610() || pCharacteristics.isExynos9611())
+            if (pCharacteristics.isExynos9610() ||
+                pCharacteristics.isExynos9611() ||
+                pCharacteristics.isExynos9820() ||
+                pCharacteristics.isExynos9825())
                 frameMetadata.setBlack_levels_bayer(new float[]{0.0f, 0.0f, 0.0f, 0.0f});
-            else if (pCharacteristics.isExynos9820() || pCharacteristics.isExynos9825())
-                frameMetadata.setBlack_levels_bayer(new float[]{0.0f, 0.0f, 0.0f, 0.0f});
+
             else // Fallback if it is Exynos
                 frameMetadata.setBlack_levels_bayer(new float[]{64.0f, 64.0f, 64.0f, 64.0f});
 
